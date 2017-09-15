@@ -3,6 +3,7 @@ import { Platform, Events } from 'ionic-angular';
 import { FingerprintAIO, FingerprintOptions } from '@ionic-native/fingerprint-aio';
 import { Constants } from '../../constants/constants';
 
+declare var window : any;
 @Component({
   selector: 'page-home',
   templateUrl: 'home.html'
@@ -11,38 +12,54 @@ export class HomePage {
 
   idleTimeoutID: number;
   isHome: boolean = true;
-  fingerprintOptions: FingerprintOptions;
+  fingerprintOptions : FingerprintOptions;
   constructor(
     public platform: Platform,
-    private events: Events,
+    private events : Events,
     private fingerprint: FingerprintAIO) {
+      
+      this.fingerprintOptions = {
+        clientId : 'fingerprint-badge',
+        // clientSecret : 'password',
+        // disableBackup : false,
+         localizedFallbackTitle: 'Use Pin', //Only for iOS
+         localizedReason: 'Please authenticate' //Only for iOS
+      }
 
-    this.fingerprintOptions = {
-      clientId: 'fingerprint-badge',
-      clientSecret: 'password'
-      //disableBackup : false,
-      // localizedFallbackTitle: 'Use Pin', //Only for iOS
-      // localizedReason: 'Please authenticate' //Only for iOS
-    }
-    this.trackingUserIdleTime();
-    this.subscribeEvents();
+      this.trackingUserIdleTime
+  ();
+      this.subscribeEvents();
   }
 
   async showFingerintDialog() {
 
-    try {
-      await this.platform.ready()
-      const avaialable = await this.fingerprint.isAvailable();
-      console.log("Fingerprit Available :::>" + avaialable);
-      if (avaialable === 'OK') {
-        const result = await this.fingerprint.show(this.fingerprintOptions);
-        this.goActive();
-        console.log("Result from Fingerprint :::> " + result);
-      }
-    } catch (error) {
-      console.error("Error from Fingerprint :::> " + error);
-      this.platform.exitApp();
+
+    window.Fingerprint.show({
+      clientId: "Fingerprint-Demo",
+      clientSecret: "password"
+    }, successCallback, errorCallback);
+
+    function successCallback(){
+      alert("Authentication successfull");
     }
+
+    function errorCallback(err){
+      alert("Authentication invalid " + err);
+    }
+
+    // try {
+    //   await this.platform.ready()
+    //   const avaialable = await this.fingerprint.isAvailable();
+    //   console.log(avaialable);
+    //   if(avaialable === 'OK') {
+    //     const result = await this.fingerprint.show(this.fingerprintOptions);
+    //     this.goActive();
+    //     console.log(result);
+    //   }
+    // } catch (error) {
+    //   console.error(error);
+    //   this.platform.exitApp();
+    // }
   }
 
 
@@ -89,6 +106,7 @@ export class HomePage {
   goInactive() {
     console.log('go inactive');
     this.events.publish('user:inactive');
+
   }
 
 }
