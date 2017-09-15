@@ -11,23 +11,21 @@ export class HomePage {
 
   idleTimeoutID: number;
   isHome: boolean = true;
-  fingerprintOptions : FingerprintOptions;
+  fingerprintOptions: FingerprintOptions;
   constructor(
     public platform: Platform,
-    private events : Events,
+    private events: Events,
     private fingerprint: FingerprintAIO) {
-      
-      this.fingerprintOptions = {
-        clientId : 'fingerprint-badge',
-        clientSecret : 'password',
-        disableBackup : false,
-        localizedFallbackTitle: 'Use Pin', //Only for iOS
-        localizedReason: 'Please authenticate' //Only for iOS
-      }
 
-      this.trackingUserIdleTime
-  ();
-      this.subscribeEvents();
+    this.fingerprintOptions = {
+      clientId: 'fingerprint-badge',
+      clientSecret: 'password'
+      //disableBackup : false,
+      // localizedFallbackTitle: 'Use Pin', //Only for iOS
+      // localizedReason: 'Please authenticate' //Only for iOS
+    }
+    this.trackingUserIdleTime();
+    this.subscribeEvents();
   }
 
   async showFingerintDialog() {
@@ -35,14 +33,14 @@ export class HomePage {
     try {
       await this.platform.ready()
       const avaialable = await this.fingerprint.isAvailable();
-      console.log(avaialable);
-      if(avaialable === 'OK') {
+      console.log("Fingerprit Available :::>" + avaialable);
+      if (avaialable === 'OK') {
         const result = await this.fingerprint.show(this.fingerprintOptions);
         this.goActive();
-        console.log(result);
+        console.log("Result from Fingerprint :::> " + result);
       }
     } catch (error) {
-      console.error(error);
+      console.error("Error from Fingerprint :::> " + error);
       this.platform.exitApp();
     }
   }
@@ -91,7 +89,6 @@ export class HomePage {
   goInactive() {
     console.log('go inactive');
     this.events.publish('user:inactive');
-
   }
 
 }
